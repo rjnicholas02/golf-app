@@ -71,17 +71,17 @@ def main():
             if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}', help=f"Assign {point} points to {player_name} for Hole {hole}"):
                 st.session_state.points_won[player_name][hole-1] = point
                 st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
-        if player_name in st.session_state.points_won:
-            st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
+        st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
 
     # Display the summary with color and style
     st.markdown("## Summary")
     summary_data = pd.DataFrame(columns=['Player', 'Total Points', 'Total Dollars'])
     for player_name in player_names:
-        total_points = sum(st.session_state.points_won[player_name])
-        total_dollars = sum(calculate_dollars_won(p, dollar_per_point) for p in st.session_state.points_won[player_name] if p > 0)
-        summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
-        summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
+        if player_name in st.session_state.points_won:
+            total_points = sum(st.session_state.points_won[player_name])
+            total_dollars = sum(calculate_dollars_won(p, dollar_per_point) for p in st.session_state.points_won[player_name] if p > 0)
+            summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
+            summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
     st.dataframe(summary_data.style.format({'Total Dollars': '${:,.2f}'}).set_properties(**{'text-align': 'center'}))
 

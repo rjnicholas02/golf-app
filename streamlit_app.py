@@ -38,8 +38,8 @@ def main():
         st.subheader(f'Hole {hole}')
         for idx, player_name in enumerate(player_names):
             st.write(f"{player_name}:")
-            cols = st.columns(9)
-            for point in range(1, 10):
+            cols = st.columns(5)
+            for point in range(1, 6):
                 if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}'):
                     points_won[player_name][hole-1] = point
             st.write(f"Points: {points_won[player_name][hole-1]}")

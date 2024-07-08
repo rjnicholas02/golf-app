@@ -57,11 +57,10 @@ def main():
 
     # Display the summary
     st.subheader("Summary")
-    summary_data = pd.DataFrame(columns=['Player', 'Total Points', 'Total Dollars'])
+    summary_data = pd.DataFrame(columns=['Player', 'Total Points'])
     for player_name in player_names:
         total_points = sum(st.session_state.points_won[player_name])
-        total_dollars = st.session_state.data[f'{player_name} Dollars'].sum()
-        summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
+        summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points]})
         summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
     st.dataframe(summary_data)
@@ -79,7 +78,7 @@ def main():
         if st.button('Confirm Reset'):
             st.session_state.current_hole = 1
             st.session_state.points_won = {name: [0] * 18 for name in player_names}
-            st.session_state.data = pd.DataFrame(columns=columns)
+            st.session_state.data = pd.DataFrame(columns=['Hole'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names])
             st.session_state.data['Hole'] = range(1, 19)
             st.session_state.confirm_reset = False
             st.experimental_rerun()

@@ -64,6 +64,25 @@ def main():
 
     st.dataframe(summary_data)
 
+    # Edit table
+    st.subheader("Edit Scores")
+    edited_data = st.session_state.data.copy()
+
+    # Edit scores directly in the table
+    for idx, player_name in enumerate(player_names):
+        for hole in range(1, 19):
+            points_col = f'{player_name} Points'
+            new_points = st.number_input(f'{player_name} Points (Hole {hole})', min_value=0, max_value=5, value=int(edited_data.loc[edited_data['Hole'] == hole, points_col].values[0]), key=f'{hole}_{player_name}_edit')
+            edited_data.loc[edited_data['Hole'] == hole, points_col] = new_points
+            dollars_col = f'{player_name} Dollars'
+            edited_data.loc[edited_data['Hole'] == hole, dollars_col] = calculate_dollars_won(new_points, dollar_per_point)
+
+    if st.button('Save Changes'):
+        st.session_state.data = edited_data.copy()
+        st.success("Changes saved successfully")
+
+    st.dataframe(edited_data)
+
 # Run the app
 if __name__ == "__main__":
     main()

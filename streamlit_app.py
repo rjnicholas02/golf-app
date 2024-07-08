@@ -25,6 +25,8 @@ def main():
         columns = ['Hole'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names]
         st.session_state.data = pd.DataFrame(columns=columns)
         st.session_state.data['Hole'] = range(1, 19)
+    if 'confirm_reset' not in st.session_state:
+        st.session_state.confirm_reset = False
 
     # Function to set the current hole
     def set_hole(hole):
@@ -71,12 +73,18 @@ def main():
 
     # Button to reset the game
     if st.button('Start Over'):
-        if st.confirm('Are you sure you want to start over? This will erase all data and start the game over.'):
+        st.session_state.confirm_reset = True
+
+    if st.session_state.confirm_reset:
+        if st.button('Confirm Reset'):
             st.session_state.current_hole = 1
             st.session_state.points_won = {name: [0] * 18 for name in player_names}
             st.session_state.data = pd.DataFrame(columns=columns)
             st.session_state.data['Hole'] = range(1, 19)
+            st.session_state.confirm_reset = False
             st.experimental_rerun()
+        if st.button('Cancel'):
+            st.session_state.confirm_reset = False
 
 if __name__ == "__main__":
     main()

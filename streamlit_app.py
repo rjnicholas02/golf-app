@@ -2,14 +2,9 @@
 import streamlit as st
 import pandas as pd
 
-# Constants
-POINTS_PER_HOLE = 27
-DOLLAR_PER_POINT = 3
-MAX_POINTS = 9
-
 # Helper function to calculate dollars won
 def calculate_dollars_won(points_won, dollar_per_point):
-    return (points_won * dollar_per_point * 2) - ((MAX_POINTS - points_won) * dollar_per_point)
+    return (points_won * dollar_per_point * 2) - ((9 - points_won) * dollar_per_point)
 
 # Main function to run the app
 def main():
@@ -17,13 +12,22 @@ def main():
 
     # User input for number of players
     num_players = st.number_input("Enter number of players", min_value=1, value=3)
+    
+    # User input for player names
+    player_names = []
+    for i in range(num_players):
+        player_name = st.text_input(f'Enter name for Player {i+1}', f'Player {i+1}')
+        player_names.append(player_name)
+    
+    # User input for dollar per point
+    dollar_per_point = st.selectbox("Select dollar amount per point", [1, 2, 3, 4, 5], index=2)
 
     # Create a dataframe to store points and dollars won
-    columns = ['Hole', 'Points Allocated'] + [f'Player {i+1} Points' for i in range(num_players)] + [f'Player {i+1} Dollars' for i in range(num_players)]
+    columns = ['Hole', 'Points Allocated'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names]
     data = pd.DataFrame(columns=columns)
 
     # Initialize points won dictionary
-    points_won = {f'Player {i+1}': [0] * 18 for i in range(num_players)}
+    points_won = {name: [0] * 18 for name in player_names}
 
     # Fill the hole and points allocated columns
     data['Hole'] = range(1, 19)
@@ -32,22 +36,27 @@ def main():
     # Input buttons for points won
     for hole in range(1, 19):
         st.subheader(f'Hole {hole}')
-        for player in range(num_players):
-            player_key = f'Player {player+1}'
-            if st.button(f'{player_key} +1 (Hole {hole})', key=f'{hole}_{player}_plus'):
-                if points_won[player_key][hole-1] < MAX_POINTS:
-                    points_won[player_key][hole-1] += 1
-            if st.button(f'{player_key} -1 (Hole {hole})', key=f'{hole}_{player}_minus'):
-                if points_won[player_key][hole-1] > 0:
-                    points_won[player_key][hole-1] -= 1
-            data.loc[data['Hole'] == hole, f'{player_key} Points'] = points_won[player_key][hole-1]
+        cols = st.columns(len(player_names) * 5)
+        for idx, player_name in enumerate(player_names):
+            with cols[idx*5]:
+                st.write(player_name)
+            if cols[idx*5+1].button('+1', key=f'{hole}_{player_name}_plus'):
+                if points_won[player_name][hole-1] < 9:
+                    points_won[player_name][hole-1] += 1
+            if cols[idx*5+2].button('+0', key=f'{hole}_{player_name}_zero'):
+                points_won[player_name][hole-1] = 0
+            if cols[idx*5+3].button('-1', key=f'{hole}_{player_name}_minus'):
+                if points_won[player_name][hole-1] > 0:
+                    points_won[player_name][hole-1] -= 1
+            with cols[idx*5+4]:
+                st.write(points_won[player_name][hole-1])
+            data.loc[data['Hole'] == hole, f'{player_name} Points'] = points_won[player_name][hole-1]
         
         # Calculate dollars won for each player
-        for player in range(num_players):
-            player_key = f'Player {player+1}'
-            points = points_won[player_key][hole-1]
-            dollars = calculate_dollars_won(points, DOLLAR_PER_POINT)
-            data.loc[data['Hole'] == hole, f'{player_key} Dollars'] = dollars
+        for player_name in player_names:
+            points = points_won[player_name][hole-1]
+            dollars = calculate_dollars_won(points, dollar_per_point)
+            data.loc[data['Hole'] == hole, f'{player_name} Dollars'] = dollars
 
     # Display the data
     st.subheader("Game Data")
@@ -56,11 +65,10 @@ def main():
     # Summary of total points and dollars won
     st.subheader("Summary")
     summary_data = pd.DataFrame(columns=['Player', 'Total Points', 'Total Dollars'])
-    for player in range(num_players):
-        player_key = f'Player {player+1}'
-        total_points = sum(points_won[player_key])
-        total_dollars = data[f'{player_key} Dollars'].sum()
-        summary_row = pd.DataFrame({'Player': [player_key], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
+    for player_name in player_names:
+        total_points = sum(points_won[player_name])
+        total_dollars = data[f'{player_name} Dollars'].sum()
+        summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
         summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
     st.dataframe(summary_data)

@@ -38,6 +38,15 @@ def main():
     if 'confirm_reset' not in st.session_state:
         st.session_state.confirm_reset = False
 
+    # Ensure player points_won and data columns are up-to-date
+    for name in player_names:
+        if name not in st.session_state.points_won:
+            st.session_state.points_won[name] = [0] * 18
+        if f'{name} Points' not in st.session_state.data.columns:
+            st.session_state.data[f'{name} Points'] = None
+        if f'{name} Dollars' not in st.session_state.data.columns:
+            st.session_state.data[f'{name} Dollars'] = None
+
     # Function to set the current hole
     def set_hole(hole):
         st.session_state.current_hole = hole
@@ -53,15 +62,6 @@ def main():
     # Current hole
     hole = st.session_state.current_hole
     st.subheader(f'Hole {hole}')
-
-    # Ensure player points_won and data columns are up-to-date
-    for name in player_names:
-        if name not in st.session_state.points_won:
-            st.session_state.points_won[name] = [0] * 18
-        if f'{name} Points' not in st.session_state.data.columns:
-            st.session_state.data[f'{name} Points'] = None
-        if f'{name} Dollars' not in st.session_state.data.columns:
-            st.session_state.data[f'{name} Dollars'] = None
 
     # Input buttons for points won
     for idx, player_name in enumerate(player_names):

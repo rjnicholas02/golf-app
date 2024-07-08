@@ -11,8 +11,13 @@ def main():
     st.title("Golf Game App - 9's")
 
     # User input for player names
-    player_names = [st.text_input(f'Enter name for Player {i+1}', f'Player {i+1}') for i in range(3)]
+    if 'player_names' not in st.session_state:
+        st.session_state.player_names = [st.text_input(f'Enter name for Player {i+1}', f'Player {i+1}') for i in range(3)]
+    else:
+        st.session_state.player_names = [st.text_input(f'Enter name for Player {i+1}', st.session_state.player_names[i]) for i in range(3)]
     
+    player_names = st.session_state.player_names
+
     # User input for dollar per point
     dollar_per_point = st.selectbox("Select dollar amount per point", [1, 2, 3, 4, 5], index=2)
 

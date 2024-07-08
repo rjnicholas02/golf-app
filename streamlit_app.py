@@ -22,10 +22,9 @@ def main():
     if 'points_won' not in st.session_state:
         st.session_state.points_won = {name: [0] * 18 for name in player_names}
     if 'data' not in st.session_state:
-        columns = ['Hole', 'Points Allocated'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names]
+        columns = ['Hole'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names]
         st.session_state.data = pd.DataFrame(columns=columns)
         st.session_state.data['Hole'] = range(1, 19)
-        st.session_state.data['Points Allocated'] = 9
 
     # Current hole
     hole = st.session_state.current_hole
@@ -68,17 +67,25 @@ def main():
     st.subheader("Edit Scores")
     edited_data = st.session_state.data.copy()
 
-    # Edit scores directly in the table
+    # Create an editable grid for scores
     for idx, player_name in enumerate(player_names):
+        st.write(player_name)
         for hole in range(1, 19):
-            points_col = f'{player_name} Points'
-            new_points = st.number_input(f'{player_name} Points (Hole {hole})', min_value=0, max_value=5, value=int(edited_data.loc[edited_data['Hole'] == hole, points_col].values[0]), key=f'{hole}_{player_name}_edit')
-            edited_data.loc[edited_data['Hole'] == hole, points_col] = new_points
-            dollars_col = f'{player_name} Dollars'
-            edited_data.loc[edited_data['Hole'] == hole, dollars_col] = calculate_dollars_won(new_points, dollar_per_point)
+            edited_data.loc[edited_data['Hole'] == hole, f'{player_name} Points'] = st.number_input(
+                f'Points (Hole {hole})', 
+                min_value=0, 
+                max_value=5, 
+                value=int(edited_data.loc[edited_data['Hole'] == hole, f'{player_name} Points'] or 0), 
+                key=f'{hole}_{player_name}_edit'
+            )
 
     if st.button('Save Changes'):
-        st.session_state.data = edited_data.copy()
+        for idx, player_name in enumerate(player_names):
+            for hole in range(1, 19):
+                new_points = int(edited_data.loc[edited_data['Hole'] == hole, f'{player_name} Points'])
+                st.session_state.points_won[player_name][hole-1] = new_points
+                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = new_points
+                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Dollars'] = calculate_dollars_won(new_points, dollar_per_point)
         st.success("Changes saved successfully")
 
     st.dataframe(edited_data)

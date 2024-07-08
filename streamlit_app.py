@@ -36,20 +36,13 @@ def main():
     # Input buttons for points won
     for hole in range(1, 19):
         st.subheader(f'Hole {hole}')
-        cols = st.columns(len(player_names) * 5)
         for idx, player_name in enumerate(player_names):
-            with cols[idx*5]:
-                st.write(player_name)
-            if cols[idx*5+1].button('+1', key=f'{hole}_{player_name}_plus'):
-                if points_won[player_name][hole-1] < 9:
-                    points_won[player_name][hole-1] += 1
-            if cols[idx*5+2].button('+0', key=f'{hole}_{player_name}_zero'):
-                points_won[player_name][hole-1] = 0
-            if cols[idx*5+3].button('-1', key=f'{hole}_{player_name}_minus'):
-                if points_won[player_name][hole-1] > 0:
-                    points_won[player_name][hole-1] -= 1
-            with cols[idx*5+4]:
-                st.write(points_won[player_name][hole-1])
+            st.write(f"{player_name}:")
+            cols = st.columns(9)
+            for point in range(1, 10):
+                if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}'):
+                    points_won[player_name][hole-1] = point
+            st.write(f"Points: {points_won[player_name][hole-1]}")
             data.loc[data['Hole'] == hole, f'{player_name} Points'] = points_won[player_name][hole-1]
         
         # Calculate dollars won for each player

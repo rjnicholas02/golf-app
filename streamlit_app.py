@@ -10,13 +10,18 @@ def calculate_dollars_won(points_won, dollar_per_point):
 def main():
     st.title("Golf Game App - 9's")
 
-    # User input for player names
+    # Initialize player names in session state
     if 'player_names' not in st.session_state:
-        st.session_state.player_names = [st.text_input(f'Enter name for Player {i+1}', f'Player {i+1}') for i in range(3)]
-    else:
-        st.session_state.player_names = [st.text_input(f'Enter name for Player {i+1}', st.session_state.player_names[i]) for i in range(3)]
+        st.session_state.player_names = [f'Player {i+1}' for i in range(3)]
     
-    player_names = st.session_state.player_names
+    # Display user input for player names
+    player_names = []
+    for i in range(3):
+        player_name = st.text_input(f'Enter name for Player {i+1}', st.session_state.player_names[i])
+        player_names.append(player_name)
+    
+    # Update player names in session state
+    st.session_state.player_names = player_names
 
     # User input for dollar per point
     dollar_per_point = st.selectbox("Select dollar amount per point", [1, 2, 3, 4, 5], index=2)
@@ -32,6 +37,11 @@ def main():
         st.session_state.data['Hole'] = range(1, 19)
     if 'confirm_reset' not in st.session_state:
         st.session_state.confirm_reset = False
+
+    # Update points_won dictionary if player names change
+    for name in player_names:
+        if name not in st.session_state.points_won:
+            st.session_state.points_won[name] = [0] * 18
 
     # Function to set the current hole
     def set_hole(hole):

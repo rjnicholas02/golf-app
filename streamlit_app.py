@@ -60,7 +60,8 @@ def main():
         player_key = f'Player {player+1}'
         total_points = sum(points_won[player_key])
         total_dollars = data[f'{player_key} Dollars'].sum()
-        summary_data = summary_data.append({'Player': player_key, 'Total Points': total_points, 'Total Dollars': total_dollars}, ignore_index=True)
+        summary_row = pd.DataFrame({'Player': [player_key], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
+        summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
     st.dataframe(summary_data)
 

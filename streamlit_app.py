@@ -77,11 +77,10 @@ def main():
     st.markdown("## Summary")
     summary_data = pd.DataFrame(columns=['Player', 'Total Points', 'Total Dollars'])
     for player_name in player_names:
-        if player_name in st.session_state.points_won:
-            total_points = sum(st.session_state.points_won[player_name])
-            total_dollars = sum(calculate_dollars_won(p, dollar_per_point) for p in st.session_state.points_won[player_name] if p > 0)
-            summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
-            summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
+        total_points = sum(st.session_state.points_won[player_name])
+        total_dollars = sum(calculate_dollars_won(p, dollar_per_point) for p in st.session_state.points_won[player_name] if p > 0)
+        summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
+        summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
     st.dataframe(summary_data.style.format({'Total Dollars': '${:,.2f}'}).set_properties(**{'text-align': 'center'}))
 

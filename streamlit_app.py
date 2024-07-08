@@ -71,7 +71,8 @@ def main():
             if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}', help=f"Assign {point} points to {player_name} for Hole {hole}"):
                 st.session_state.points_won[player_name][hole-1] = point
                 st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
-        st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
+        if player_name in st.session_state.points_won:
+            st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
 
     # Display the summary with color and style
     st.markdown("## Summary")

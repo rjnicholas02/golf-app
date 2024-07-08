@@ -64,6 +64,19 @@ def main():
 
     st.dataframe(summary_data)
 
-# Run the app
+    # Display hole-by-hole summary
+    st.subheader("Hole-by-Hole Summary")
+    hole_summary_data = st.session_state.data.copy()
+    st.dataframe(hole_summary_data)
+
+    # Button to reset the game
+    if st.button('Start Over'):
+        if st.confirm('Are you sure you want to start over? This will erase all data and start the game over.'):
+            st.session_state.current_hole = 1
+            st.session_state.points_won = {name: [0] * 18 for name in player_names}
+            st.session_state.data = pd.DataFrame(columns=columns)
+            st.session_state.data['Hole'] = range(1, 19)
+            st.experimental_rerun()
+
 if __name__ == "__main__":
     main()

@@ -32,21 +32,16 @@ def main():
     if 'points_won' not in st.session_state:
         st.session_state.points_won = {name: [0] * 18 for name in player_names}
     if 'data' not in st.session_state:
-        columns = ['Hole'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names]
+        columns = ['Hole'] + [f'{name} Points' for name in player_names]
         st.session_state.data = pd.DataFrame(columns=columns)
         st.session_state.data['Hole'] = range(1, 19)
     if 'confirm_reset' not in st.session_state:
         st.session_state.confirm_reset = False
 
     # Ensure player points_won and data columns are up-to-date
-    for name in player_names:
-        if name not in st.session_state.points_won:
-            st.session_state.points_won[name] = [0] * 18
-        if f'{name} Points' not in st.session_state.data.columns:
-            st.session_state.data[f'{name} Points'] = None
-        if f'{name} Dollars' not in st.session_state.data.columns:
-            st.session_state.data[f'{name} Dollars'] = None
-
+    new_columns = ['Hole'] + [f'{name} Points' for name in player_names]
+    st.session_state.data = st.session_state.data.reindex(columns=new_columns)
+    
     # Function to set the current hole
     def set_hole(hole):
         st.session_state.current_hole = hole
@@ -71,7 +66,6 @@ def main():
             if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}'):
                 st.session_state.points_won[player_name][hole-1] = point
                 st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
-                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Dollars'] = calculate_dollars_won(point, dollar_per_point)
         st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
 
     # Display the summary
@@ -79,7 +73,7 @@ def main():
     summary_data = pd.DataFrame(columns=['Player', 'Total Points', 'Total Dollars'])
     for player_name in player_names:
         total_points = sum(st.session_state.points_won[player_name])
-        total_dollars = st.session_state.data[f'{player_name} Dollars'].sum()
+        total_dollars = sum(calculate_dollars_won(p, dollar_per_point) for p in st.session_state.points_won[player_name])
         summary_row = pd.DataFrame({'Player': [player_name], 'Total Points': [total_points], 'Total Dollars': [total_dollars]})
         summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
@@ -87,7 +81,7 @@ def main():
 
     # Display hole-by-hole summary
     st.subheader("Hole-by-Hole Summary")
-    hole_summary_data = st.session_state.data.copy()
+    hole_summary_data = st.session_state.data[['Hole'] + [f'{name} Points' for name in player_names]].copy()
     st.dataframe(hole_summary_data)
 
     # Button to reset the game
@@ -98,7 +92,7 @@ def main():
         if st.button('Confirm Reset'):
             st.session_state.current_hole = 1
             st.session_state.points_won = {name: [0] * 18 for name in player_names}
-            st.session_state.data = pd.DataFrame(columns=['Hole'] + [f'{name} Points' for name in player_names] + [f'{name} Dollars' for name in player_names])
+            st.session_state.data = pd.DataFrame(columns=['Hole'] + [f'{name} Points' for name in player_names])
             st.session_state.data['Hole'] = range(1, 19)
             st.session_state.confirm_reset = False
             st.experimental_rerun()

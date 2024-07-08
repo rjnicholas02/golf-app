@@ -26,6 +26,18 @@ def main():
         st.session_state.data = pd.DataFrame(columns=columns)
         st.session_state.data['Hole'] = range(1, 19)
 
+    # Function to set the current hole
+    def set_hole(hole):
+        st.session_state.current_hole = hole
+
+    # Display hole buttons for navigation
+    st.subheader("Select Hole to Edit")
+    cols = st.columns(6)
+    for hole in range(1, 19):
+        col = cols[(hole-1) % 6]
+        if col.button(f'Hole {hole}', key=f'select_hole_{hole}'):
+            set_hole(hole)
+
     # Current hole
     hole = st.session_state.current_hole
     st.subheader(f'Hole {hole}')
@@ -37,20 +49,9 @@ def main():
         for point in range(1, 6):
             if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}'):
                 st.session_state.points_won[player_name][hole-1] = point
+                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
+                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Dollars'] = calculate_dollars_won(point, dollar_per_point)
         st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
-
-    # Enter button to submit the scores and move to the next hole
-    if st.button('Enter'):
-        for player_name in player_names:
-            points = st.session_state.points_won[player_name][hole-1]
-            st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = points
-            dollars = calculate_dollars_won(points, dollar_per_point)
-            st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Dollars'] = dollars
-        
-        if hole < 18:
-            st.session_state.current_hole += 1
-        else:
-            st.subheader("Game Completed")
 
     # Display the summary
     st.subheader("Summary")
@@ -62,33 +63,6 @@ def main():
         summary_data = pd.concat([summary_data, summary_row], ignore_index=True)
 
     st.dataframe(summary_data)
-
-    # Edit table
-    st.subheader("Edit Scores")
-    edited_data = st.session_state.data.copy()
-
-    # Create an editable grid for scores
-    for idx, player_name in enumerate(player_names):
-        st.write(player_name)
-        for hole in range(1, 19):
-            edited_data.loc[edited_data['Hole'] == hole, f'{player_name} Points'] = st.number_input(
-                f'Points (Hole {hole})', 
-                min_value=0, 
-                max_value=5, 
-                value=int(edited_data.loc[edited_data['Hole'] == hole, f'{player_name} Points'] or 0), 
-                key=f'{hole}_{player_name}_edit'
-            )
-
-    if st.button('Save Changes'):
-        for idx, player_name in enumerate(player_names):
-            for hole in range(1, 19):
-                new_points = int(edited_data.loc[edited_data['Hole'] == hole, f'{player_name} Points'])
-                st.session_state.points_won[player_name][hole-1] = new_points
-                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = new_points
-                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Dollars'] = calculate_dollars_won(new_points, dollar_per_point)
-        st.success("Changes saved successfully")
-
-    st.dataframe(edited_data)
 
 # Run the app
 if __name__ == "__main__":

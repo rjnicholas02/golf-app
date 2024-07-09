@@ -57,6 +57,7 @@ def main():
         <style>
         .hole-buttons-container {
             display: flex;
+            flex-wrap: nowrap;
             overflow-x: auto;
             padding: 10px 0;
         }
@@ -80,17 +81,14 @@ def main():
 
     # Display hole buttons for navigation with horizontal scrolling
     st.markdown("## Select Hole to Edit")
-    hole_button_container = st.container()
-    with hole_button_container:
-        st.markdown('<div class="hole-buttons-container">', unsafe_allow_html=True)
-        for hole in range(1, 19):
-            if st.button(f'Hole {hole}', key=f'select_hole_{hole}', help=f"Edit scores for Hole {hole}", args=(hole,), on_click=set_hole):
-                set_hole(hole)
-            st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hole-buttons-container">', unsafe_allow_html=True)
+    for hole in range(1, 19):
+        st.markdown(f'<button class="hole-button" onclick="window.location.href=\'#Hole{hole}\'">{hole}</button>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Current hole
     hole = st.session_state.current_hole
-    st.markdown(f"### Hole {hole}")
+    st.markdown(f'<h3 id="Hole{hole}">Hole {hole}</h3>', unsafe_allow_html=True)
 
     # Input buttons for points won with horizontal layout
     for idx, player_name in enumerate(player_names):

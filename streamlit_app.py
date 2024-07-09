@@ -1,4 +1,3 @@
-# Import necessary libraries
 import streamlit as st
 import pandas as pd
 
@@ -53,12 +52,12 @@ def main():
 
     # Display hole buttons for navigation with color and style
     st.markdown("## Select Hole to Edit")
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    hole_cols = [col1, col2, col3, col4, col5, col6]
-    for hole in range(1, 19):
-        with hole_cols[(hole-1) % 6]:
-            if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
-                set_hole(hole)
+    rows = [st.columns(6) for _ in range(3)]
+    hole_buttons = [f'Hole {i}' for i in range(1, 19)]
+    for i, hole in enumerate(hole_buttons):
+        col = rows[i // 6][i % 6]
+        if col.button(hole):
+            set_hole(i + 1)
 
     # Current hole
     hole = st.session_state.current_hole
@@ -107,5 +106,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

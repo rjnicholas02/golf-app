@@ -60,6 +60,7 @@ def main():
             flex-wrap: nowrap;
             overflow-x: auto;
             padding: 10px 0;
+            margin-bottom: 20px;
         }
         .hole-button {
             flex: 0 0 auto;

@@ -51,16 +51,14 @@ def main():
     def set_hole(hole):
         st.session_state.current_hole = hole
 
-    # Display hole buttons for navigation with color and style
+    # Display hole buttons for navigation with horizontal scrolling
     st.markdown("## Select Hole to Edit")
-    hole_button_cols = st.columns(9)
-    for i in range(2):
-        for j in range(9):
-            hole = i * 9 + j + 1
-            with hole_button_cols[j]:
-                if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
-                    set_hole(hole)
-
+    hole_button_container = st.container()
+    with hole_button_container:
+        for hole in range(1, 19):
+            if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
+                set_hole(hole)
+    
     # Current hole
     hole = st.session_state.current_hole
     st.markdown(f"### Hole {hole}")

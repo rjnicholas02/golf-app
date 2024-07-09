@@ -53,11 +53,12 @@ def main():
 
     # Display hole buttons for navigation with color and style
     st.markdown("## Select Hole to Edit")
-    cols = st.columns(6)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    hole_cols = [col1, col2, col3, col4, col5, col6]
     for hole in range(1, 19):
-        col = cols[(hole-1) % 6]
-        if col.button(f'Hole {hole}', key=f'select_hole_{hole}'):
-            set_hole(hole)
+        with hole_cols[(hole-1) % 6]:
+            if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
+                set_hole(hole)
 
     # Current hole
     hole = st.session_state.current_hole

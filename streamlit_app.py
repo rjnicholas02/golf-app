@@ -53,12 +53,13 @@ def main():
 
     # Display hole buttons for navigation with color and style
     st.markdown("## Select Hole to Edit")
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    hole_cols = [col1, col2, col3, col4, col5, col6]
-    for hole in range(1, 19):
-        with hole_cols[(hole-1) % 6]:
-            if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
-                set_hole(hole)
+    hole_button_cols = st.columns(9)
+    for i in range(2):
+        for j in range(9):
+            hole = i * 9 + j + 1
+            with hole_button_cols[j]:
+                if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
+                    set_hole(hole)
 
     # Current hole
     hole = st.session_state.current_hole
@@ -67,11 +68,12 @@ def main():
     # Input buttons for points won with color and style
     for idx, player_name in enumerate(player_names):
         st.markdown(f"#### {player_name}:")
-        cols = st.columns(5)
+        point_cols = st.columns(5)
         for point in range(1, 6):
-            if cols[point-1].button(f'{point}', key=f'{hole}_{player_name}_{point}', help=f"Assign {point} points to {player_name} for Hole {hole}"):
-                st.session_state.points_won[player_name][hole-1] = point
-                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
+            with point_cols[point-1]:
+                if st.button(f'{point}', key=f'{hole}_{player_name}_{point}', help=f"Assign {point} points to {player_name} for Hole {hole}"):
+                    st.session_state.points_won[player_name][hole-1] = point
+                    st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
         st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
 
     # Display the summary with color and style

@@ -58,12 +58,12 @@ def main():
         .hole-buttons-container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: space-around;
             padding: 10px 0;
             margin-bottom: 20px;
         }
         .hole-button {
-            flex: 1 0 14%;
+            flex: 0 1 14%;
             margin: 5px;
         }
         .point-button-container {

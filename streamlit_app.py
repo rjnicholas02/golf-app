@@ -51,20 +51,20 @@ def main():
     def set_hole(hole):
         st.session_state.current_hole = hole
 
-    # Add CSS for horizontal scrolling and responsive design
+    # Add CSS for responsive design
     st.markdown(
         """
         <style>
         .hole-buttons-container {
             display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
+            flex-wrap: wrap;
+            justify-content: space-between;
             padding: 10px 0;
             margin-bottom: 20px;
         }
         .hole-button {
-            flex: 0 0 auto;
-            margin-right: 10px;
+            flex: 1 0 14%;
+            margin: 5px;
         }
         .point-button-container {
             display: flex;
@@ -80,7 +80,7 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # Display hole buttons for navigation with horizontal scrolling
+    # Display hole buttons for navigation with horizontal layout
     st.markdown("## Select Hole to Edit")
     st.markdown('<div class="hole-buttons-container">', unsafe_allow_html=True)
     for hole in range(1, 19):

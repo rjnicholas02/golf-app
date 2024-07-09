@@ -5,31 +5,12 @@ import pandas as pd
 def calculate_dollars_won(points_won, dollar_per_point):
     return (points_won * dollar_per_point * 2) - ((9 - points_won) * dollar_per_point)
 
-# Custom CSS to arrange buttons in rows of 6
-def add_custom_css():
-    st.markdown("""
-        <style>
-        .hole-buttons-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .hole-buttons-container button {
-            flex: 1 0 calc(16.66% - 10px);
-            box-sizing: border-box;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
 # Main function to run the app
 def main():
     # Set the title and description of the app
     st.set_page_config(page_title="Golf Game Tracker - 9's", page_icon="⛳", layout="centered")
     st.title("Golf Game Tracker - 9's")
     st.write("Track your golf game scores and winnings with ease!")
-
-    # Add custom CSS
-    add_custom_css()
 
     # Initialize player names in session state
     if 'player_names' not in st.session_state:
@@ -71,11 +52,12 @@ def main():
 
     # Display hole buttons for navigation with color and style
     st.markdown("## Select Hole to Edit")
-    st.markdown('<div class="hole-buttons-container">', unsafe_allow_html=True)
-    for hole in range(1, 19):
-        if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
-            set_hole(hole)
-    st.markdown('</div>', unsafe_allow_html=True)
+    rows = [st.columns(6) for _ in range(3)]
+    hole_buttons = [f'Hole {i}' for i in range(1, 19)]
+    for i, hole in enumerate(hole_buttons):
+        col = rows[i // 6][i % 6]
+        if col.button(hole):
+            set_hole(i + 1)
 
     # Current hole
     hole = st.session_state.current_hole

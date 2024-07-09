@@ -51,27 +51,56 @@ def main():
     def set_hole(hole):
         st.session_state.current_hole = hole
 
+    # Add CSS for horizontal scrolling and responsive design
+    st.markdown(
+        """
+        <style>
+        .hole-buttons-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .hole-button {
+            flex: 0 0 auto;
+            margin-right: 10px;
+        }
+        .point-button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .point-button {
+            flex: 1;
+            margin: 0 5px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # Display hole buttons for navigation with horizontal scrolling
     st.markdown("## Select Hole to Edit")
     hole_button_container = st.container()
     with hole_button_container:
+        st.markdown('<div class="hole-buttons-container">', unsafe_allow_html=True)
         for hole in range(1, 19):
-            if st.button(f'Hole {hole}', key=f'select_hole_{hole}'):
+            if st.button(f'Hole {hole}', key=f'select_hole_{hole}', help=f"Edit scores for Hole {hole}", args=(hole,), on_click=set_hole):
                 set_hole(hole)
-    
+            st.markdown('</div>', unsafe_allow_html=True)
+
     # Current hole
     hole = st.session_state.current_hole
     st.markdown(f"### Hole {hole}")
 
-    # Input buttons for points won with color and style
+    # Input buttons for points won with horizontal layout
     for idx, player_name in enumerate(player_names):
         st.markdown(f"#### {player_name}:")
-        point_cols = st.columns(5)
+        st.markdown('<div class="point-button-container">', unsafe_allow_html=True)
         for point in range(1, 6):
-            with point_cols[point-1]:
-                if st.button(f'{point}', key=f'{hole}_{player_name}_{point}', help=f"Assign {point} points to {player_name} for Hole {hole}"):
-                    st.session_state.points_won[player_name][hole-1] = point
-                    st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
+            if st.button(f'{point}', key=f'{hole}_{player_name}_{point}', help=f"Assign {point} points to {player_name} for Hole {hole}"):
+                st.session_state.points_won[player_name][hole-1] = point
+                st.session_state.data.loc[st.session_state.data['Hole'] == hole, f'{player_name} Points'] = point
+        st.markdown('</div>', unsafe_allow_html=True)
         st.write(f"Points: {st.session_state.points_won[player_name][hole-1]}")
 
     # Display the summary with color and style
